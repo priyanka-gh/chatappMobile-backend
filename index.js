@@ -40,7 +40,7 @@ socketio.on('connect',(socket)=>{
     socket.on('join',({name,room},callback)=>{
         const{error,user}=addUser({id:socket.id,name,room});
         if(error) return callback(error);
-        socket.join(user.room);
+        socket.join(user?.room);
 
         const roomRef = db.collection(user.room);
         const previousMessages = [];
@@ -50,7 +50,7 @@ socketio.on('connect',(socket)=>{
             querySnapshot.forEach(documentSnapshot => {
                 previousMessages.push(documentSnapshot.data());
             })
-            socketio.to(user.room).emit('prev-messages', previousMessages);
+            socketio.to(user?.room).emit('prev-messages', previousMessages);
         }
 
         getPreviousMessages();
@@ -58,7 +58,7 @@ socketio.on('connect',(socket)=>{
         // socket.emit('message',{user:'admin',text:`${user.name}, welcome to the room ${user.room}`})
         // socket.broadcast.to(user.room).emit('message',{user:'admin',text:`${user.name}, has joined!`})
 
-        socketio.to(user.room).emit('roomData',{room:user.room,users : getUsersInRoom(user.room)})
+        socketio.to(user?.room).emit('roomData',{room:user.room,users : getUsersInRoom(user.room)})
 
         callback();
     })
@@ -68,13 +68,13 @@ socketio.on('connect',(socket)=>{
         const alluser = getUsersInRoom(socket.id);
 
         console.log("user ",user)
-        socketio.to(user.room).emit('message', { user: user.name, text: message });
-        socketio.to(user.room).emit('roomData',{room:user.room,users:getUsersInRoom(user.room)})
+        socketio.to(user?.room).emit('message', { user: user.name, text: message });
+        socketio.to(user?.room).emit('roomData',{room:user.room,users:getUsersInRoom(user.room)})
 
         const roomRef = db.collection(user.room);
 
         roomRef.doc(""+Date.now()).set({
-            user: user.name,
+            user: user?.name,
             text: message
         })
     
